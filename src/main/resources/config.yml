@@ -1,0 +1,11 @@
+defaultBagSlots: 18
+warnings:
+  lockedSlot: "&e[!]&7 Bu slota eşya koymak için daha iyi bir çantaya ihtiyacın var."
+items:
+  Kucuk Canta:
+    material: CHEST
+    slot: 27
+
+  Buyuk Canta:
+    material: CHEST
+    slot: 36

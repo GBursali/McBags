@@ -1,0 +1,5 @@
+name: Canta
+version: '${project.version}'
+main: com.canta.Canta
+api-version: 1.19
+authors: [ GB ]
