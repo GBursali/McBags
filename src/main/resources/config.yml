@@ -1,11 +1,13 @@
-defaultBagSlots: 18
+defaultBagSlots: 9
+frameMaterial: "BLACK_STAINED_GLASS_PANE"
 warnings:
   lockedSlot: "&e[!]&7 Bu slota eşya koymak için daha iyi bir çantaya ihtiyacın var."
+  lockedSlotClick: "&e[!]&7 Bu slotu açmak için çanta kullanmalısın."
 items:
-  Kucuk Canta:
+  Küçük Çanta:
     material: CHEST
-    slot: 27
+    slot: 18
 
-  Buyuk Canta:
+  Büyük Çanta:
     material: CHEST
     slot: 36
