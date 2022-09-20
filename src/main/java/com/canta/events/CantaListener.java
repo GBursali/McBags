@@ -5,8 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -17,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import javax.annotation.Nullable;
-import java.io.*;
 import java.util.Objects;
 
 public class CantaListener implements Listener {
@@ -29,16 +26,6 @@ public class CantaListener implements Listener {
 
     public ConfigurationSection getBagTypes() {
         return callerPlugin.getConfig().getConfigurationSection("items");
-//        if(fileStream==null)
-//            throw new RuntimeException("items.yml file not found");
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(fileStream));
-//        YamlConfiguration config = new YamlConfiguration();
-//        try {
-//            config.load(reader);
-//        } catch (IOException | InvalidConfigurationException e) {
-//            throw new RuntimeException(e);
-//        }
-//        return config;
     }
     private boolean isItemIsABag(ItemStack item){
         if(!item.hasItemMeta())
@@ -74,7 +61,7 @@ public class CantaListener implements Listener {
         return getBagTypes().getInt(Objects.requireNonNull(bag.getItemMeta()).getDisplayName() + ".slot");
     }
 
-    private boolean checkInventory(Player inventoryOwner, @Nullable ItemStack cursor, int slot){
+    private boolean checkInventory(Player inventoryOwner, @Nullable ItemStack cursor, int slot, boolean refund){
         int availableIndexes = getSlotCountOfTheBag(inventoryOwner);
         ItemStack currentItem = inventoryOwner.getInventory().getItem(slot);
         if(!(cursor == null || cursor.getType().equals(Material.AIR)) &&
@@ -82,8 +69,8 @@ public class CantaListener implements Listener {
                 slot>=availableIndexes){
             inventoryOwner.sendMessage(Objects.requireNonNull(callerPlugin.getConfig().getString("warnings.lockedSlot")).replace('&',ChatColor.COLOR_CHAR));
             Bukkit.getScheduler().runTask(callerPlugin, () -> {
-                inventoryOwner.getInventory().addItem(cursor);
-//                    inventoryOwner.setItemOnCursor(null);
+                if(refund)
+                    inventoryOwner.getInventory().addItem(cursor);
                 inventoryOwner.closeInventory();
             });
             return false;
@@ -94,7 +81,10 @@ public class CantaListener implements Listener {
     public void onPlayerMoveItem(InventoryClickEvent event){
         if (!(event.getWhoClicked() instanceof Player inventoryOwner))
             return;
-        if(!checkInventory(inventoryOwner, event.getCursor(), event.getSlot())){
+        if(event.getClickedInventory()==null || !event.getClickedInventory().getType().equals(InventoryType.PLAYER))
+            return;
+        boolean refund = event.getView().getTopInventory().getType().equals(InventoryType.CRAFTING);
+        if(!checkInventory(inventoryOwner, event.getCursor(), event.getSlot(),refund)){
             event.setResult(Event.Result.DENY);
         }
     }
