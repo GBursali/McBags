@@ -17,10 +17,10 @@ public class LockedItem {
     public Material material;
     public String name;
 
-    public LockedItem(Canta canta){
+    public LockedItem(Canta canta) {
         callerPlugin = canta;
         name = "Kilitli";
-        material = Material.getMaterial(callerPlugin.getConfig().getString("lockedFrameMaterial","BLACK_STAINED_GLASS_PANE"));
+        material = Material.getMaterial(callerPlugin.getConfig().getString("lockedFrameMaterial", "BLACK_STAINED_GLASS_PANE"));
         assert material != null;
         item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
@@ -28,11 +28,11 @@ public class LockedItem {
         item.setItemMeta(meta);
     }
 
-    public boolean isClickedToFrame(InventoryClickEvent event){
+    public boolean isClickedToFrame(InventoryClickEvent event) {
         return isFrame(event.getCurrentItem());
     }
 
-    private boolean isFrame(ItemStack item){
+    private boolean isFrame(ItemStack item) {
         return
                 item != null &&
                         item.getItemMeta() != null &&
@@ -41,15 +41,17 @@ public class LockedItem {
                         item.isSimilar(this.item);
     }
 
-    public void lockInventory(Player player,int slots){
+    public void lockInventory(Player player, int slots) {
         for (int i = 0; i < slots; i++) {
-            if(isFrame(player.getInventory().getItem(i))){
-                player.getInventory().setItem(i,null);
-            }
+            if (isFrame(player.getInventory().getItem(i)))
+                player.getInventory().setItem(i, null);
+
         }
-        for (int i = player.getInventory().getStorageContents().length-1; i >= slots; i--) {
-            if(player.getInventory().getItem(i) == null)
-                player.getInventory().setItem(i,item);
+        for (int i = player.getInventory().getStorageContents().length - 1; i >= slots; i--) {
+            if (player.getInventory().getItem(i) != null && !isFrame(player.getInventory().getItem(i)))
+                player.getWorld().dropItem(player.getLocation(), Objects.requireNonNull(player.getInventory().getItem(i)));
+
+            player.getInventory().setItem(i, item);
         }
     }
 
